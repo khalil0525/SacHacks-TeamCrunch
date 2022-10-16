@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
         .status(400)
         .json({ message: "Not enough parameters in POST /goal route" });
     } else {
-      emptyVisionBoardTable();
+      await emptyVisionBoardTable();
       const result = await pool.query(addToVisionBoard, [img1, img2, img3]);
       res.json({ message: "Successful" });
     }
