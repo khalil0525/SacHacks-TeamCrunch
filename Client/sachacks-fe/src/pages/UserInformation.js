@@ -20,10 +20,29 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const UserInformation = (props) => {
   const [value, setValue] = useState([null, null]);
+
+  useEffect(() => {
+    // declare the data fetching function
+
+    const date = `${value["$y"]}-${value["$M"]}-${value["$D"]}`;
+    console.log(date);
+    const fetchData = async () => {
+      const response = await fetch(
+        `http://localhost:5000/api/transactions?aggregate=true&startDate=${date}&endDate="2022-10-16"`
+      );
+      const data = await response.json();
+      console.log(data);
+    };
+
+    // call the function
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error);
+  }, [value]);
   const createData = (
     number,
     merchantName,
