@@ -1,7 +1,12 @@
 const { Router } = require("express");
 const router = Router();
 const pool = require("../database/db");
-const { addToVisionBoard, addToCommitmentTable } = require("./queries");
+const {
+  addToVisionBoard,
+  addToCommitmentTable,
+  getVisionBoard,
+  getCommitment,
+} = require("./queries");
 
 router.post("/", async (req, res) => {
   const { img1, img2, img3, duration, amount } = req.body;
@@ -29,7 +34,14 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  res.send("Here");
+  const visionBoardQuery = await pool.query(getVisionBoard);
+  const commitmentQuery = await pool.query(getCommitment);
+  const data = {
+    visionBoard: visionBoardQuery.rows,
+    commitment: commitmentQuery.rows,
+  };
+
+  res.send(data);
 });
 
 const emptyVisionBoardTable = async (req, res) => {

@@ -10,4 +10,5 @@ module.exports = {
   addToVisionBoard,
   addToCommitmentTable,
   getVisionBoard,
+  getCommitment,
 };
