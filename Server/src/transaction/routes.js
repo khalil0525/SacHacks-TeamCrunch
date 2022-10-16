@@ -32,6 +32,10 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/receipt", (req, res) => {
+  res.send("here");
+});
+
 function sortDescending(a, b) {
   return b.amount - a.amount;
 }
