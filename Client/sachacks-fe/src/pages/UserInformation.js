@@ -16,14 +16,28 @@ import {
   Paper,
   TextField,
 } from "@mui/material";
-
+import { moment } from "moment";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const UserInformation = (props) => {
-  const [value, setValue] = useState([null, null]);
+const UserInformation = ({ getTransactions }) => {
+  const [value, setValue] = useState();
+
+  const handleDatePickerChange = async (value) => {
+    setValue(value);
+  };
+
+  useEffect(() => {
+    const handleChartChange = async () => {
+      let today = new Date();
+      let priorDate = new Date(new Date().setDate(today.getDate() - 30));
+      const { data } = await getTransactions(value, "2022-10-16");
+      console.log(data);
+    };
+  }, [value, getTransactions]);
+
   const createData = (
     number,
     merchantName,
@@ -108,13 +122,11 @@ const UserInformation = (props) => {
         }}
       >
         <Box>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
             <DatePicker
               label="Pick 30 day start date"
               value={value}
-              onChange={(newValue) => {
-                setValue(newValue);
-              }}
+              onChange={(value) => handleDatePickerChange(value)}
               renderInput={(params) => <TextField {...params} />}
             />
           </LocalizationProvider>
