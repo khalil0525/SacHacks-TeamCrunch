@@ -21,28 +21,15 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useState, useEffect } from "react";
-
+import axios from "axios";
 const UserInformation = (props) => {
-  const [value, setValue] = useState([null, null]);
-
-  useEffect(() => {
-    // declare the data fetching function
-
-    const date = `${value["$y"]}-${value["$M"]}-${value["$D"]}`;
-    console.log(date);
-    const fetchData = async () => {
-      const response = await fetch(
-        `http://localhost:5000/api/transactions?aggregate=true&startDate=${date}&endDate="2022-10-16"`
-      );
-      const data = await response.json();
-      console.log(data);
-    };
-
-    // call the function
-    fetchData()
-      // make sure to catch any error
-      .catch(console.error);
-  }, [value]);
+  const [value, setValue] = useState(new Date());
+  const [chartData, setChartData] = useState();
+  const [photoOne, setPhotoOne] = useState("/images/placeholder.png");
+  const [photoTwo, setPhotoTwo] = useState("/images/placeholder.png");
+  const [photoThree, setPhotoThree] = useState("/images/placeholder.png");
+  const [totalYears, setTotalYears] = useState(10000);
+  const [totalMoney, setTotalMoney] = useState(10);
   const createData = (
     number,
     merchantName,
@@ -56,13 +43,46 @@ const UserInformation = (props) => {
       oneYearAmountSpentPrediction,
     };
   };
-  const rows = [
-    createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-    createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-    createData("Eclair", 262, 16.0, 24, 6.0),
-    createData("Cupcake", 305, 3.7, 67, 4.3),
-    createData("Gingerbread", 356, 16.0, 49, 3.9),
-  ];
+
+  useEffect(() => {
+    // declare the data fetching function
+
+    const date = `${value["$y"]}-${value["$M"]}-${value["$D"]}`;
+
+    const fetchData = async () => {
+      if (value) {
+        const response = await fetch(
+          `http://localhost:5000/api/transactions?aggregate=true&startDate=${date}&endDate="2022-10-16"`
+        );
+        const data = await response.json();
+        const response2 = await fetch("http://localhost:5000/api/goal");
+
+        const data2 = await response2.json();
+        setPhotoOne(data2.visionBoard[0].img_link);
+        setPhotoTwo(data2.visionBoard[1].img_link);
+        setPhotoThree(data2.visionBoard[2].img_link);
+        setTotalYears(data2.commitment[0].duration);
+        setTotalMoney(data2.commitment[0].amount);
+        console.log(data2);
+        setChartData(
+          data.map((transaction, index) =>
+            createData(
+              index,
+              transaction.merchant_name,
+              transaction.amount,
+              transaction.amount * 12 * data2.commitment[0].duration
+            )
+          )
+        );
+      }
+    };
+
+    // call the function
+    fetchData()
+      // make sure to catch any error
+      .catch(console.error);
+  }, [value]);
+
   return (
     <Grid container sx={{ height: "100vh" }}>
       <Box
@@ -84,20 +104,12 @@ const UserInformation = (props) => {
         >
           <Card sx={{ width: 140, height: 140 }}>
             <CardActionArea>
-              <CardMedia
-                component="img"
-                height="140"
-                image="/images/placeholder.png"
-              />
+              <CardMedia component="img" height="140" image={photoOne} />
             </CardActionArea>
           </Card>
           <Card sx={{ width: 140, height: 140 }}>
             <CardActionArea>
-              <CardMedia
-                component="img"
-                height="140"
-                image="/images/placeholder.png"
-              />
+              <CardMedia component="img" height="140" image={photoTwo} />
             </CardActionArea>
           </Card>
           <Card sx={{ width: 140, height: 140 }}>
@@ -106,13 +118,25 @@ const UserInformation = (props) => {
                 component="img"
                 width="140"
                 height="140"
-                image="/images/placeholder.png"
+                image={photoThree}
               />
             </CardActionArea>
           </Card>
         </Box>
-        <Box sx={{ backgroundColor: "gray", padding: "20px", width: "300px" }}>
-          <Typography>Goal: 4000$ for trip to Italy in 4 years</Typography>
+        <Box
+          sx={{
+            backgroundColor: "whitesmoke",
+            padding: "20px",
+            width: "300px",
+          }}
+        >
+          {totalMoney ? (
+            <Typography>
+              Goal: save ${totalMoney} for {totalYears} years
+            </Typography>
+          ) : (
+            <Typography>No date range set</Typography>
+          )}
         </Box>
       </Box>
       <Box
@@ -152,24 +176,25 @@ const UserInformation = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.name}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row.number}
-                    </TableCell>
+                {chartData &&
+                  chartData.map((row) => (
+                    <TableRow
+                      key={row.name}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.number}
+                      </TableCell>
 
-                    <TableCell align="right">{row.merchantName}</TableCell>
-                    <TableCell align="right">
-                      {row.thirtyDayAmountSpent}
-                    </TableCell>
-                    <TableCell align="right">
-                      {row.oneYearAmountSpentPrediction}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell align="right">{row.merchantName}</TableCell>
+                      <TableCell align="right">
+                        {row.thirtyDayAmountSpent}
+                      </TableCell>
+                      <TableCell align="right">
+                        {row.oneYearAmountSpentPrediction}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
