@@ -41,7 +41,7 @@ router.get("/", async (req, res) => {
     commitment: commitmentQuery.rows,
   };
 
-  res.send(data);
+  res.json(data);
 });
 
 const emptyVisionBoardTable = async (req, res) => {
