@@ -17,16 +17,19 @@ function PlaidLink() {
 
   const onSuccess = useCallback(async (publicToken, metadata) => {
     //TODO: Start showing loading screen
-    const result = fetch("http://localhost:5000/api/accounts/public_token", {
-      method: "POST",
-      body: JSON.stringify({
-        publicToken: publicToken,
-      }),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+    const result = await fetch(
+      "http://localhost:5000/api/accounts/public_token",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          publicToken: publicToken,
+        }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
     console.log(result.json());
   }, []);
 
