@@ -1,152 +1,115 @@
-import React, { state, useState } from "react";
-import AppBar from "@mui/material/AppBar";
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import CssBaseline from "@mui/material/CssBaseline";
-import Grid from "@mui/material/Grid";
-import Item from "@mui/material/Grid";
-import Stack from "@mui/material/Stack";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useEffect, useRef, useState } from "react";
+import TextField from "@mui/material/TextField";
+import {
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Fab,
+  Grid,
+} from "@mui/material";
+import axios from "axios";
+import AddPhotoAlternateIcon from "@material-ui/icons/AddPhotoAlternate";
 
-const VisionBoard = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedImage1, setSelectedImage1] = useState(null);
-  const [selectedImage2, setSelectedImage2] = useState(null);
-  const theme = createTheme();
-  const amount = 2000;
-  const thing = "phone";
+const VisionBoard = (props) => {
+  const inputRef = useRef(null);
+  const [files, setFiles] = useState([]);
+  const [imagesURL, setImagesURL] = useState([]);
+  const [duration, setDuration] = useState(0);
+  const [amount, setAmount] = useState(0);
+  const upload = (e) => {
+    e.preventDefault();
+    const uploaders = files.map((file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "tcojxvly");
+
+      return axios
+        .post(
+          `https://api.cloudinary.com/v1_1/nabroleon/image/upload`,
+          formData
+        )
+        .then((res) => {
+          setImagesURL((prevState) => [...prevState, res.data.secure_url]);
+        });
+    });
+
+    axios.all(uploaders).then(console.log(imagesURL));
+  };
+
+  useEffect(() => {
+    if (imagesURL.length === 3) {
+      axios.post("http://localhost:5000/api/goal", {
+        img1: imagesURL[0],
+        img2: imagesURL[1],
+        img3: imagesURL[2],
+        duration: duration,
+        amount: amount,
+      });
+    }
+  }, [imagesURL]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppBar position="relative">
-        <Toolbar>
-          <Typography variant="h6" color="inherit" align="center">
-            Vision Board
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <>
+      <label htmlFor="amount">Amount</label>
+      <TextField
+        type="number"
+        onChange={(e) => setAmount(e.target.value)}
+        id="amount"
+        label="Outlined"
+      />
+      <br />
+      <br />
+      <label htmlFor="duration">Duration</label>
+      <TextField
+        type="number"
+        onChange={(e) => setDuration(e.target.value)}
+        id="duration"
+        label="Outlined"
+      />
 
-      <Container maxWidth="sm">
-        <Typography
-          component="h1"
-          variant="h2"
-          align="center"
-          color="text.primary"
-          gutterBottom
-        >
-          Set Goals
-        </Typography>
-      </Container>
+      {files.length !== 0 && (
+        <Grid item xs={12} marginLeft={3}>
+          <Grid container marginTop={3} gap={3}>
+            {files.map((file) => (
+              <Card sx={{ maxWidth: 345 }}>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    image={URL.createObjectURL(file)}
+                    alt="green iguana"
+                  />
+                </CardActionArea>
+              </Card>
+            ))}
+          </Grid>
+        </Grid>
+      )}
 
-      <Grid container spacing={3}>
-        <Grid item xs={3}>
-          <h4>
-            {" "}
-            I want to commit to {amount} for {thing}
-          </h4>
-          <h4>Upload first image</h4>
-          {selectedImage && (
-            <Box>
-              <img
-                alt="not fount"
-                width={"250px"}
-                src={URL.createObjectURL(selectedImage)}
-              />
-              <br />
-              <Button
-                variant="contained"
-                onClick={() => setSelectedImage(null)}
-              >
-                Remove
-              </Button>
-            </Box>
-          )}
-
-          <br />
-
-          <br />
+      <CardContent>
+        <Grid container justify="center" alignItems="center">
           <input
+            accept="image/*"
+            multiple
             type="file"
-            name="myImage"
-            onChange={(event) => {
-              console.log(event.target.files[0]);
-              setSelectedImage(event.target.files[0]);
+            ref={inputRef}
+            style={{ display: "none" }}
+            onChange={(e) => {
+              setFiles(Array.from(e.target.files));
             }}
           />
+          <label htmlFor="contained-button-file">
+            <Fab component="span" onClick={() => inputRef.current.click()}>
+              <AddPhotoAlternateIcon />
+            </Fab>
+          </label>
         </Grid>
-        <Grid item xs={6}>
-          <Item>
-            <h4>
-              I want to commit to {amount} for {thing}
-            </h4>
-            <h4>Upload second image</h4>
-            {selectedImage1 && (
-              <div>
-                <img
-                  alt="not fount"
-                  width={"250px"}
-                  src={URL.createObjectURL(selectedImage1)}
-                />
-                <br />
-                <button onClick={() => setSelectedImage1(null)}>Remove</button>
-              </div>
-            )}
-            <br />
-
-            <br />
-            <input
-              type="file"
-              name="myImage"
-              onChange={(event) => {
-                console.log(event.target.files[0]);
-                setSelectedImage1(event.target.files[0]);
-              }}
-            />
-          </Item>
-        </Grid>
-
-        <Grid item xs={9}>
-          <Item>
-            <h4>
-              I want to commit to {amount} for {thing}
-            </h4>
-            <h4>Upload third image</h4>
-            {selectedImage2 && (
-              <Box>
-                <img
-                  alt="not fount"
-                  width={"250px"}
-                  src={URL.createObjectURL(selectedImage2)}
-                />
-                <br />
-                <button onClick={() => setSelectedImage2(null)}>Remove</button>
-              </Box>
-            )}
-            <br />
-
-            <br />
-            <input
-              type="file"
-              name="myImage"
-              onChange={(event) => {
-                console.log(event.target.files[0]);
-                setSelectedImage2(event.target.files[0]);
-              }}
-            />
-          </Item>
-        </Grid>
-      </Grid>
-      {/* End footer */}
-    </ThemeProvider>
+      </CardContent>
+      <Button variant="outlined" onClick={upload}>
+        Upload Images
+      </Button>
+    </>
   );
 };
 
