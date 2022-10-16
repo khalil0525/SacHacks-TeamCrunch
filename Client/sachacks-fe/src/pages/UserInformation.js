@@ -46,7 +46,14 @@ const UserInformation = (props) => {
   ];
   return (
     <Grid container sx={{ height: "100vh" }}>
-      <Box>
+      <Box
+        sx={{
+          marginLeft: "40px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+        }}
+      >
         <Typography>Vision Board</Typography>
         <Box
           sx={{
@@ -85,7 +92,7 @@ const UserInformation = (props) => {
             </CardActionArea>
           </Card>
         </Box>
-        <Box>
+        <Box sx={{ backgroundColor: "gray", padding: "20px", width: "300px" }}>
           <Typography>Goal: 4000$ for trip to Italy in 4 years</Typography>
         </Box>
       </Box>
