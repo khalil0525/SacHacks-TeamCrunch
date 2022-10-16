@@ -28,6 +28,10 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  res.send("Here");
+});
+
 const emptyVisionBoardTable = async (req, res) => {
   const query = "DELETE FROM vision_board;";
   const result = await pool.query(query);
