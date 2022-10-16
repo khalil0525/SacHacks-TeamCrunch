@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
       const { rows } = await pool.query(getAllTransactions);
       const aggregatedTransactions = aggregateData(rows);
       const sorted = aggregatedTransactions.sort(sortDescending);
-      return sorted;
+      res.json(sorted);
     } else {
       const { rows } = await pool.query(getAllTransactions);
       res.json(rows);
