@@ -41,10 +41,10 @@ router.get("/", async (req, res) => {
       visionBoard: visionBoardQuery.rows,
       commitment: commitmentQuery.rows,
     };
-
     res.json(data);
   } catch (e) {
-    console.log(e);
+    console.log("Error in GET /goal route", e);
+    res.status(400).json({ message: "Error in GET /goal route" });
   }
 });
 
