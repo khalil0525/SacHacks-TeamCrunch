@@ -14,6 +14,7 @@ router.post("/", async (req, res) => {
         .status(400)
         .json({ message: "Not enough parameters in POST /goal route" });
     } else {
+      emptyVisionBoardTable();
       const result = await pool.query(addToVisionBoard, [img1, img2, img3]);
       res.json({ message: "Successful" });
     }
@@ -22,5 +23,10 @@ router.post("/", async (req, res) => {
     res.status(400).json({ message: "Error in POST /goal route" });
   }
 });
+
+const emptyVisionBoardTable = async (req, res) => {
+  const query = "DELETE FROM vision_board;";
+  const result = await pool.query(query);
+};
 
 module.exports = router;
