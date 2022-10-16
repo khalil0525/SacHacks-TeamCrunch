@@ -3,7 +3,11 @@ const addToVisionBoard =
 const addToCommitmentTable =
   "INSERT INTO commitment (uid,amount,duration) VALUES (1,$1,$2) ON CONFLICT(uid) Do UPDATE SET amount = excluded.amount, duration=excluded.duration RETURNING *";
 
+const getVisionBoard = "SELECT * FROM vision_board";
+const getCommitment = "SELECT * FROM commitment";
+
 module.exports = {
   addToVisionBoard,
   addToCommitmentTable,
+  getVisionBoard,
 };
