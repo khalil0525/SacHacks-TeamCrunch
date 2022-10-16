@@ -1,13 +1,13 @@
 const { Router } = require("express");
 const router = Router();
 const pool = require("../database/db");
-const { addToVisionBoard } = require("./queries");
+const { addToVisionBoard, addToCommitmentTable } = require("./queries");
 
 router.post("/", async (req, res) => {
-  const { img1, img2, img3 } = req.body;
+  const { img1, img2, img3, duration, amount } = req.body;
 
   try {
-    const parametersPresent = img1 && img2 && img3;
+    const parametersPresent = img1 && img2 && img3 && duration && amount;
     if (!parametersPresent) {
       console.log("Not enough parameters in POST /goal route");
       res
@@ -16,6 +16,10 @@ router.post("/", async (req, res) => {
     } else {
       await emptyVisionBoardTable();
       const result = await pool.query(addToVisionBoard, [img1, img2, img3]);
+      const resultCommitment = await pool.query(addToCommitmentTable, [
+        parseInt(duration),
+        parseInt(amount),
+      ]);
       res.json({ message: "Successful" });
     }
   } catch (e) {
