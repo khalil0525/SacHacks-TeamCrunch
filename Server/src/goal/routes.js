@@ -34,14 +34,18 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const visionBoardQuery = await pool.query(getVisionBoard);
-  const commitmentQuery = await pool.query(getCommitment);
-  const data = {
-    visionBoard: visionBoardQuery.rows,
-    commitment: commitmentQuery.rows,
-  };
+  try {
+    const visionBoardQuery = await pool.query(getVisionBoard);
+    const commitmentQuery = await pool.query(getCommitment);
+    const data = {
+      visionBoard: visionBoardQuery.rows,
+      commitment: commitmentQuery.rows,
+    };
 
-  res.json(data);
+    res.json(data);
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 const emptyVisionBoardTable = async (req, res) => {
