@@ -23,19 +23,18 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useEffect, useState } from "react";
 
 const UserInformation = ({ getTransactions }) => {
-  const [value, setValue] = useState();
+  const [value, setValue] = useState("2022-9-16");
 
-  const handleDatePickerChange = async (value) => {
-    setValue(value);
+  const handleDatePickerChange = (value) => {
+    setValue(value.format().split("T")[0]);
   };
 
   useEffect(() => {
     const handleChartChange = async () => {
-      let today = new Date();
-      let priorDate = new Date(new Date().setDate(today.getDate() - 30));
-      const { data } = await getTransactions(value, "2022-10-16");
+      const data = await getTransactions(value, "2022-9-16");
       console.log(data);
     };
+    handleChartChange();
   }, [value, getTransactions]);
 
   const createData = (

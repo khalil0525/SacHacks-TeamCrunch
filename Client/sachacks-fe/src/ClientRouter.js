@@ -8,8 +8,8 @@ import BankInformation from "./pages/BankInformation";
 
 const ClientRouter = () => {
   const getTransactions = async (startDate, endDate) => {
-    const { data } = await axios.get(
-      `http://localhost:5000/api/transactions?aggregate=true&${startDate}=%222022-10-01%22&${endDate}=%222022-10-15`
+    const data = await axios.get(
+      `http://localhost:5000/api/transactions?aggregate=true&startDate=${startDate}&endDate=${endDate}`
     );
     return data;
   };
@@ -18,7 +18,10 @@ const ClientRouter = () => {
     // <SocketContext.Provider value={socket}>
     <Routes>
       {/* <Route path="/" element={<Landing />} /> */}
-      <Route path="/" element={<UserInformation />} />
+      <Route
+        path="/"
+        element={<UserInformation getTransactions={getTransactions} />}
+      />
       <Route path="/vision" element={<VisionBoard />} />
       <Route path="/bank-information" element={<BankInformation />} />
       <Route

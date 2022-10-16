@@ -21,9 +21,11 @@ router.get("/", async (req, res) => {
       const { rows } = await pool.query(getAllTransactions);
       const aggregatedTransactions = aggregateData(rows);
       const sorted = aggregatedTransactions.sort(sortDescending);
-      res.json(sorted);
+      console.log(sorted, aggregatedTransactions);
+      res.json({ sorted });
     } else {
       const { rows } = await pool.query(getAllTransactions);
+
       res.json(rows);
     }
   } catch (e) {
